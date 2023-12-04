@@ -12,6 +12,11 @@ start() ->
   ok.
 
 close() ->
+  client ! {stop},
+  ok.
+
+is_palindrome(String) ->
+  client ! {ispal, String},
   ok.
 
 loop(Mm1, Mm2) ->
@@ -21,12 +26,9 @@ loop(Mm1, Mm2) ->
       io:format("p1 ~p, p2 ~p~n", [Part1, Part2]),
       Mm1 ! {request, Part1},
       Mm2 ! {request, lists:reverse(Part2)},
-      loop(Mm1, Mm2)
+      loop(Mm1, Mm2);
+    {stop} -> exit("stopping")
   end.
-
-is_palindrome(String) ->
-  client ! {ispal, String},
-  ok.
 
 split_string(String) when length(String) rem 2 == 0 -> % even
   L = trunc(length(String)/2),
